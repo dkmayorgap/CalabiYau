@@ -1,0 +1,10 @@
+{
+    "nlayer": 3,
+    "nHidden": 64,
+    "act": "gelu",
+    "n_in": 10,
+    "n_out": 1,
+    "alpha": [1.0, 1.0, 1.0, 1.0, 1.0],
+    "nEpochs": 30,
+    "bSizes": [64, 50000]
+}

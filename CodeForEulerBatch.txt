@@ -1,0 +1,58 @@
+CODE FOR EULERS
+
+import os, glob
+import argparse
+
+import numpy as np
+import tensorflow as tf
+
+import sys
+sys.path.append("../..")
+from models import ProjectiveSpace
+
+dirname = './QuinticData'
+args = 'val'
+data = np.load(os.path.join(dirname, 'dataset.npz'))
+x_vars = tf.cast(tf.constant(data[f"X_{args}"]), tf.float32)
+weights, omegas = data[f'y_{args}'][:,-2], data[f'y_{args}'][:,-1]
+
+riem = None
+files = sorted(glob.glob(
+    os.path.join(path_to_riems, "*.npy")),
+    key = lambda x: int(os.path.basename(x).split('.')[0][4:]))
+for riemfile in files:
+    if riem is None:
+        riem = np.load(riemfile)
+    else:
+        riem = np.append(riem, np.load(riemfile), axis=0)
+
+c3 = ProjectiveSpace.getC3(tf.cast(riem, tf.complex128))
+c3_top = ProjectiveSpace.getTopNumber(c3)
+
+norm_factor = (-2*1j)**3 / np.math.factorial(3)
+print(f"Int_X c3 = {np.real(norm_factor * np.mean(weights * c3_top / omegas))}")
+
+eud=np.real(norm_factor * weights * c3_top / omegas)
+np.savetxt('eulerd',eud)
+
+
+path_to_riems = 'riemvaluesfs'
+
+riem = None
+files = sorted(glob.glob(
+    os.path.join(path_to_riems, "*.npy")),
+    key = lambda x: int(os.path.basename(x).split('.')[0][4:]))
+for riemfile in files:
+    if riem is None:
+        riem = np.load(riemfile)
+    else:
+        riem = np.append(riem, np.load(riemfile), axis=0)
+
+c3 = ProjectiveSpace.getC3(tf.cast(riem, tf.complex128))
+c3_top = ProjectiveSpace.getTopNumber(c3)
+
+norm_factor = (-2*1j)**3 / np.math.factorial(3)
+print(f"Int_X c3 = {np.real(norm_factor * np.mean(weights * c3_top / omegas))}")
+
+eud=np.real(norm_factor * weights * c3_top / omegas)
+np.savetxt('eulerdfs',eud)
